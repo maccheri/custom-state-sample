@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo } from 'react';
+import React, { useEffect, useState, useMemo, useCallback } from 'react';
 import './App.css';
 
 const useDocumentTitle = (title) => {
@@ -9,11 +9,33 @@ const useDocumentTitle = (title) => {
 
 const App = () => {
   const [data, setData] = useState([]);
+  const [counter, setCounter] = useState(0);
   const title = useMemo(() => {
-    console.log(data);
+    console.log('rendering')
     const pendingTodos = data.filter((todo) => !todo.completed).length;
     return `You have ${pendingTodos} pending todos!`;
   }, [data]);
+
+  const onClick = useCallback((todo) => {
+    const completed = !todo.completed;
+    const newTodo = { ...todo, completed };
+    const newData = data.map(t => {
+      if (t.id === todo.id && t.userId === todo.userId) {
+        return newTodo;
+      }
+      return t;
+    });
+
+    setData(newData);
+  }, [data]); 
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCounter(c => ++c);
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, []);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -28,22 +50,11 @@ const App = () => {
 
   useDocumentTitle(title);
 
-  const onClick = (todo) => {
-    const completed = !todo.completed;
-    const newTodo = { ...todo, completed };
-    const newData = data.map(t => {
-      if (t.id === todo.id && t.userId === todo.userId) {
-        return newTodo;
-      }
-      return t;
-    });
-
-    setData(newData);
-  }
-
   return (
     <div className="App">
       <h1>Todos - {title}</h1>
+      <h2>Counter: {counter}</h2>
+      <hr />
       {data && data.map((todo) => {
         const classes = `todo ${todo.completed ? 'done' : 'pending'}`;
         return (

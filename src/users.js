@@ -5,10 +5,11 @@ const filter = (users, query) => {
   return users.filter(user => user.name.toLowerCase().includes(query.toLowerCase()));
 }
 
-const UserList = ({ users, query }) => {
+const UserList = React.memo(({ users, query }) => {
+  console.log('RENDERING');
   const filteredUsers = useMemo(() => filter(users, query), [query, users]);
   return filteredUsers.map(user => <div key={user.id}>{user.name}</div>)
-}
+})
 
 const Users = () => {
   const [users, setUsers] = useState([]);
